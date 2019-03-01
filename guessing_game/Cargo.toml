@@ -1,0 +1,13 @@
+[package]
+name = "guessing_game"
+version = "0.1.0"
+authors = ["schrodog <sky_sun_tg@hotmail.com>"]
+
+[dependencies]
+
+rand = "0.3.14"
+
+
+
+
+
