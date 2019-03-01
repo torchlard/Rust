@@ -1,60 +1,132 @@
-enum List {
-  Cons(i32, Box<List>),
-  Nil
-}
+use std::thread;
+// use std::time::Duration;
+// use std::sync::mpsc;
+use std::sync::{Mutex, Arc};
 
-use List::{Cons, Nil};
-// use std::ops::Deref;
-
-// struct MyBox<T>(T);
-
-// impl<T> MyBox<T> {
-//   fn new(x: T) -> MyBox<T> {
-//     MyBox(x)
-//   }
-// }
-
-// impl<T> Deref for MyBox<T> {
-//   type Target = T;
-//   fn deref(&self) -> &T {
-//     &self.0
-//   }
-// }
-
-// fn hello(name: &str){
-//   println!("hello, {}", name);
-// }
 
 fn main() {
 
-  let a = Cons(5, Box::new(Cons(
-    10, Box::new(Nil)
-  )));
-  let b = Cons(3, Box::new(a));
-  let c = Cons(4, Box::new(a));
+  // let counter = Mutex::new(0);
+  let counter = Arc::new(Mutex::new(0));
+  let mut handles = vec![];
 
-  // let m = MyBox::new(String::from("Rust"));
-  // hello(&(*m)[..]);
-  // hello(&m);
+  for _ in 0..10 {
+    let counter = Arc::clone(&counter);
+    let handle = thread::spawn(move || {
+      let mut num = counter.lock().unwrap();
+      *num += 1;
+    });
+    handles.push(handle);
+  }
 
-  // let list = Cons(1,
-  //   Box::new(Cons(2,
-  //     Box::new(Cons(3,
-  //       Box::new(Nil))))));
+  for handle in handles {
+    handle.join().unwrap();
+  }
 
-  // let x = 5;
-  // let y = &x;
-  // let z = &y;
+  println!("Result: {}", *counter.lock().unwrap());
 
-  // println!("{},{:?},{}", x, &x,*y);
+  // let m = Mutex::new(5);
+  // {
+  //   let mut num = m.lock().unwrap();
+  //   *num = 6;
+  // }
+  // println!("m = {:?}", m);
 
-  // let x = 5;
-  // let y = Box::new(x);
-  // assert_eq!(5, x);
-  // assert_eq!(5, *y);
-  // println!("b = {}", b);
 
+  // let (tx,rx) = mpsc::channel();
+
+  // let tx1 = mpsc::Sender::clone(&tx);
+  // thread::spawn(move || {
+  //   let vals = vec![
+  //     String::from("hi"),
+  //     String::from("from"),
+  //     String::from("the"),
+  //     String::from("thread"),
+  //   ];
+  //   for val in vals {
+  //     tx1.send(val).unwrap();
+  //     thread::sleep(Duration::from_secs(1));
+  //   }
+  // });
+  // thread::spawn(move || {
+  //   let vals = vec![
+  //     String::from("more"),
+  //     String::from("msg"),
+  //     String::from("for"),
+  //     String::from("you"),
+  //   ];
+  //   for val in vals {
+  //     tx.send(val).unwrap();
+  //     thread::sleep(Duration::from_secs(1));
+  //   }
+  // });
+
+  // for received in rx {
+  //   println!("Got {}", received);
+  // }
+
+  
+  // thread::spawn(move || {
+  //   // let val = String::from("hi");
+  //   // tx.send(val).unwrap();
+  //   // println!("val is {}", val);
+  //   let vals = vec![
+  //     String::from("hi"),
+  //     String::from("from"),
+  //     String::from("the"),
+  //     String::from("thread"),
+  //   ];
+  //   for val in vals {
+  //     tx.send(val).unwrap();
+  //     thread::sleep(Duration::from_secs(1));
+  //   }
+  // });
+
+  // for received in rx {
+  //   println!("Got: {}", received);
+  // }
+
+  // let received = rx.recv().unwrap();
+  // println!("Got: {}", received);  
+
+
+  // let v = vec![1,2,3];
+
+  // let handle = thread::spawn(move || {
+  //   println!("vector: {:?}", v);
+  // });
+
+  // // drop(v);
+
+  // handle.join().unwrap();
+
+
+  // let handle = thread::spawn(|| {
+  //   for i in 1..10 {
+  //     println!("hi number {} from spawned thread!", i);
+  //     thread::sleep(Duration::from_millis(1));
+  //   }
+  // });
+
+  // // wait for spawn thread to finish
+  // handle.join().unwrap();
+
+  // for i in 1..5 {
+  //   println!("hi num {} from main thread!", i);
+  //   thread::sleep(Duration::from_millis(1));
+  // }
+
+
+  
 }
+
+
+
+
+
+
+
+
 
 
 
